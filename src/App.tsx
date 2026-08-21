@@ -42,6 +42,11 @@ export default function App() {
     setState(resolveAction(state, { type: "REST" }));
   };
 
+  const handleInvestigate = () => {
+    if (!state) return;
+    setState(resolveAction(state, { type: "INVESTIGATE" }));
+  };
+
   return (
     <main className="app">
       <h1>Aethelgard</h1>
@@ -120,6 +125,7 @@ export default function App() {
                 <p>
                   {current.name} {current.dangerous && "⚠️"}
                 </p>
+                <button onClick={handleInvestigate}>Investigar</button>
                 <h4>Viajar a</h4>
                 <ul>
                   {current.connections.map((id) => {

@@ -7,6 +7,7 @@ export interface Campaign {
   id: string;
   seed: Seed;
   createdAt: number;
+  rollCount: number;
 }
 
 export interface Player {
@@ -43,6 +44,7 @@ export function createGameState(
       id: crypto.randomUUID(),
       seed,
       createdAt: Date.now(),
+      rollCount: 0,
     },
     player: {
       name: playerName,

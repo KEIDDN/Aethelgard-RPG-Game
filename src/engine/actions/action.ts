@@ -1,8 +1,12 @@
 import type { GameState } from "../gameState";
+import { canInvestigate, investigate } from "./investigate";
 import { canRest, rest } from "./rest";
 import { canTravelTo, travel } from "./travel";
 
-export type Action = { type: "TRAVEL"; targetLocationId: string } | { type: "REST" };
+export type Action =
+  | { type: "TRAVEL"; targetLocationId: string }
+  | { type: "REST" }
+  | { type: "INVESTIGATE" };
 
 export function canPerformAction(state: GameState, action: Action): boolean {
   switch (action.type) {
@@ -10,6 +14,8 @@ export function canPerformAction(state: GameState, action: Action): boolean {
       return canTravelTo(state, action.targetLocationId);
     case "REST":
       return canRest(state);
+    case "INVESTIGATE":
+      return canInvestigate(state);
   }
 }
 
@@ -23,5 +29,7 @@ export function resolveAction(state: GameState, action: Action): GameState {
       return travel(state, action.targetLocationId);
     case "REST":
       return rest(state);
+    case "INVESTIGATE":
+      return investigate(state);
   }
 }
