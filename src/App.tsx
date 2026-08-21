@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { travel } from "./engine/actions/travel";
+import { resolveAction } from "./engine/actions/action";
 import { ARCHETYPES, type Archetype } from "./engine/character/archetypes";
 import { createGameState, type GameState } from "./engine/gameState";
 import { deleteCampaign, listCampaigns, saveCampaign } from "./persistence/campaignStorage";
@@ -34,7 +34,12 @@ export default function App() {
 
   const handleTravel = (locationId: string) => {
     if (!state) return;
-    setState(travel(state, locationId));
+    setState(resolveAction(state, { type: "TRAVEL", targetLocationId: locationId }));
+  };
+
+  const handleRest = () => {
+    if (!state) return;
+    setState(resolveAction(state, { type: "REST" }));
   };
 
   return (
@@ -137,6 +142,7 @@ export default function App() {
               <li key={i}>{entry}</li>
             ))}
           </ul>
+          <button onClick={handleRest}>Descansar</button>
           <button onClick={handleSave}>Guardar</button>
           <button onClick={() => setState(null)}>Volver al menú</button>
         </section>
