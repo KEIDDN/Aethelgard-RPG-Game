@@ -36,4 +36,17 @@ export class SeededRNG {
   int(min: number, max: number): number {
     return Math.floor(this.next() * (max - min + 1)) + min;
   }
+
+  pick<T>(items: readonly T[]): T {
+    return items[this.int(0, items.length - 1)];
+  }
+
+  shuffle<T>(items: readonly T[]): T[] {
+    const result = [...items];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = this.int(0, i);
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  }
 }
