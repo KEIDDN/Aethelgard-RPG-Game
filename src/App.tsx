@@ -47,6 +47,11 @@ export default function App() {
     setState(resolveAction(state, { type: "INVESTIGATE" }));
   };
 
+  const handleAttack = () => {
+    if (!state) return;
+    setState(resolveAction(state, { type: "ATTACK" }));
+  };
+
   return (
     <main className="app">
       <h1>Aethelgard</h1>
@@ -125,6 +130,12 @@ export default function App() {
                 <p>
                   {current.name} {current.dangerous && "⚠️"}
                 </p>
+                {current.enemy && current.enemy.currentHp > 0 && (
+                  <p>
+                    {current.enemy.name} — PV {current.enemy.currentHp}/{current.enemy.maxHp}
+                    <button onClick={handleAttack}>Atacar</button>
+                  </p>
+                )}
                 <button onClick={handleInvestigate}>Investigar</button>
                 <h4>Viajar a</h4>
                 <ul>

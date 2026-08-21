@@ -1,3 +1,4 @@
+import { attack, canAttack } from "../combat/combat";
 import type { GameState } from "../gameState";
 import { canInvestigate, investigate } from "./investigate";
 import { canRest, rest } from "./rest";
@@ -6,7 +7,8 @@ import { canTravelTo, travel } from "./travel";
 export type Action =
   | { type: "TRAVEL"; targetLocationId: string }
   | { type: "REST" }
-  | { type: "INVESTIGATE" };
+  | { type: "INVESTIGATE" }
+  | { type: "ATTACK" };
 
 export function canPerformAction(state: GameState, action: Action): boolean {
   switch (action.type) {
@@ -16,6 +18,8 @@ export function canPerformAction(state: GameState, action: Action): boolean {
       return canRest(state);
     case "INVESTIGATE":
       return canInvestigate(state);
+    case "ATTACK":
+      return canAttack(state);
   }
 }
 
@@ -31,5 +35,7 @@ export function resolveAction(state: GameState, action: Action): GameState {
       return rest(state);
     case "INVESTIGATE":
       return investigate(state);
+    case "ATTACK":
+      return attack(state);
   }
 }

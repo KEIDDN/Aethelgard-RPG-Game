@@ -25,3 +25,11 @@ export const LANDMARK_NAMES = [
   "Piedras Rúnicas",
   "Molino Silencioso",
 ];
+
+export const ENEMY_NAMES = [
+  "Lobo Escuálido",
+  "Bandido Solitario",
+  "Esqueleto Errante",
+  "Araña Gigante",
+  "Trasgo Huraño",
+];
