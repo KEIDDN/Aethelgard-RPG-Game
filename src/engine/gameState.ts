@@ -1,3 +1,4 @@
+import { getArchetype, type Archetype, type Attributes } from "./character/archetypes";
 import { generateCampaignSeed, type Seed } from "./rng";
 import { generateWorld } from "./world/generateWorld";
 import type { World } from "./world/types";
@@ -10,6 +11,10 @@ export interface Campaign {
 
 export interface Player {
   name: string;
+  archetype: Archetype;
+  attributes: Attributes;
+  maxHp: number;
+  currentHp: number;
   currentLocationId: string;
 }
 
@@ -25,8 +30,13 @@ export interface GameState {
   history: string[];
 }
 
-export function createGameState(playerName: string, seed: Seed = generateCampaignSeed()): GameState {
+export function createGameState(
+  playerName: string,
+  archetype: Archetype,
+  seed: Seed = generateCampaignSeed(),
+): GameState {
   const world = generateWorld(seed);
+  const definition = getArchetype(archetype);
 
   return {
     campaign: {
@@ -36,6 +46,10 @@ export function createGameState(playerName: string, seed: Seed = generateCampaig
     },
     player: {
       name: playerName,
+      archetype,
+      attributes: { ...definition.attributes },
+      maxHp: definition.maxHp,
+      currentHp: definition.maxHp,
       currentLocationId: world.startingLocationId,
     },
     world,
@@ -44,6 +58,7 @@ export function createGameState(playerName: string, seed: Seed = generateCampaig
     },
     history: [
       `Campaña iniciada con semilla ${seed}.`,
+      `${definition.name} listo para la aventura.`,
       `El mundo generado se llama "${world.region.name}".`,
     ],
   };

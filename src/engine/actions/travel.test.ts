@@ -4,7 +4,7 @@ import { canTravelTo, travel } from "./travel";
 
 describe("travel", () => {
   it("moves the player to a connected location", () => {
-    const state = createGameState("Hero", 1);
+    const state = createGameState("Hero", "guerrero", 1);
     const destination = state.world.region.locations.find(
       (l) => l.id !== state.player.currentLocationId,
     )!;
@@ -16,7 +16,7 @@ describe("travel", () => {
   });
 
   it("throws when the destination is not connected", () => {
-    const state = createGameState("Hero", 1);
+    const state = createGameState("Hero", "guerrero", 1);
     expect(canTravelTo(state, "not-a-real-place")).toBe(false);
     expect(() => travel(state, "not-a-real-place")).toThrow();
   });

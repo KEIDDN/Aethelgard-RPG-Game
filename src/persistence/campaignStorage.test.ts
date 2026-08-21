@@ -8,15 +8,15 @@ beforeEach(() => {
 
 describe("campaignStorage", () => {
   it("round-trips a campaign through save/load", () => {
-    const state = createGameState("Test Hero", 999);
+    const state = createGameState("Test Hero", "guerrero", 999);
     saveCampaign(state);
     const loaded = loadCampaign(state.campaign.id);
     expect(loaded).toEqual(state);
   });
 
   it("lists saved campaigns", () => {
-    const a = createGameState("Hero A", 1);
-    const b = createGameState("Hero B", 2);
+    const a = createGameState("Hero A", "guerrero", 1);
+    const b = createGameState("Hero B", "picaro", 2);
     saveCampaign(a);
     saveCampaign(b);
     const ids = listCampaigns().map((c) => c.campaign.id);
@@ -25,7 +25,7 @@ describe("campaignStorage", () => {
   });
 
   it("removes a campaign on delete", () => {
-    const state = createGameState("Hero C", 3);
+    const state = createGameState("Hero C", "mago", 3);
     saveCampaign(state);
     deleteCampaign(state.campaign.id);
     expect(loadCampaign(state.campaign.id)).toBeNull();

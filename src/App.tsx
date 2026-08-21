@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { travel } from "./engine/actions/travel";
+import { ARCHETYPES, type Archetype } from "./engine/character/archetypes";
 import { createGameState, type GameState } from "./engine/gameState";
 import { deleteCampaign, listCampaigns, saveCampaign } from "./persistence/campaignStorage";
 import "./App.css";
@@ -7,10 +8,11 @@ import "./App.css";
 export default function App() {
   const [state, setState] = useState<GameState | null>(null);
   const [playerName, setPlayerName] = useState("");
+  const [archetype, setArchetype] = useState<Archetype>("guerrero");
   const [campaigns, setCampaigns] = useState<GameState[]>(() => listCampaigns());
 
   const startCampaign = () => {
-    const newState = createGameState(playerName || "Aventurero sin nombre");
+    const newState = createGameState(playerName || "Aventurero sin nombre", archetype);
     setState(newState);
   };
 
@@ -47,6 +49,26 @@ export default function App() {
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
           />
+
+          <h3>Arquetipo</h3>
+          <ul>
+            {Object.values(ARCHETYPES).map((def) => (
+              <li key={def.id}>
+                <label>
+                  <input
+                    type="radio"
+                    name="archetype"
+                    checked={archetype === def.id}
+                    onChange={() => setArchetype(def.id)}
+                  />
+                  <strong>{def.name}</strong> — {def.description} (PV {def.maxHp}, FUE{" "}
+                  {def.attributes.fuerza}, DES {def.attributes.destreza}, INT{" "}
+                  {def.attributes.inteligencia})
+                </label>
+              </li>
+            ))}
+          </ul>
+
           <button onClick={startCampaign}>Iniciar campaña</button>
 
           {campaigns.length > 0 && (
@@ -72,6 +94,16 @@ export default function App() {
           <p>Semilla de campaña: {state.campaign.seed}</p>
           <p>Región: {state.world.region.name}</p>
           <p>Día: {state.clock.day}</p>
+
+          <h3>Personaje</h3>
+          <p>{ARCHETYPES[state.player.archetype].name}</p>
+          <p>
+            PV: {state.player.currentHp} / {state.player.maxHp}
+          </p>
+          <p>
+            FUE {state.player.attributes.fuerza} · DES {state.player.attributes.destreza} · INT{" "}
+            {state.player.attributes.inteligencia}
+          </p>
 
           <h3>Ubicación actual</h3>
           {(() => {
