@@ -3,11 +3,12 @@ import {
   DUNGEON_NAMES,
   ENEMY_NAMES,
   LANDMARK_NAMES,
+  NPC_NAMES,
   REGION_PREFIXES,
   REGION_SUFFIXES,
   SETTLEMENT_NAMES,
 } from "./names";
-import type { Enemy, Location, World } from "./types";
+import type { Enemy, Location, NPC, Quest, World } from "./types";
 
 export function generateWorld(seed: Seed): World {
   const rng = new SeededRNG(seed);
@@ -55,11 +56,30 @@ export function generateWorld(seed: Seed): World {
 
   settlement.connections = [dungeon.id, ...landmarks.map((l) => l.id)];
 
+  const npc: NPC = {
+    id: "npc_settlement",
+    name: rng.pick(NPC_NAMES),
+    locationId: settlement.id,
+    greeting: `Un viajero como tú es justo lo que necesitábamos en ${settlementName}.`,
+  };
+
+  const quest: Quest = {
+    id: "quest_dungeon",
+    title: `Elimina a ${enemy.name}`,
+    description: `${npc.name} te pide que acabes con ${enemy.name}, que acecha en ${dungeonName}.`,
+    giverId: npc.id,
+    objectiveLocationId: dungeon.id,
+    accepted: false,
+    completed: false,
+  };
+
   return {
     region: {
       name: regionName,
       locations: [settlement, dungeon, ...landmarks],
     },
     startingLocationId: settlement.id,
+    npcs: [npc],
+    quest,
   };
 }

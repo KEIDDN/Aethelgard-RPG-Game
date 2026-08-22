@@ -23,7 +23,26 @@ export interface Region {
   locations: Location[];
 }
 
+export interface NPC {
+  id: string;
+  name: string;
+  locationId: string;
+  greeting: string;
+}
+
+export interface Quest {
+  id: string;
+  title: string;
+  description: string;
+  giverId: string;
+  objectiveLocationId: string;
+  accepted: boolean;
+  completed: boolean;
+}
+
 export interface World {
   region: Region;
   startingLocationId: string;
+  npcs: NPC[];
+  quest: Quest;
 }

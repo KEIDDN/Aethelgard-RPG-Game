@@ -52,6 +52,11 @@ export default function App() {
     setState(resolveAction(state, { type: "ATTACK" }));
   };
 
+  const handleTalk = () => {
+    if (!state) return;
+    setState(resolveAction(state, { type: "TALK" }));
+  };
+
   return (
     <main className="app">
       <h1>Aethelgard</h1>
@@ -120,6 +125,16 @@ export default function App() {
             {state.player.attributes.inteligencia}
           </p>
 
+          {state.world.quest.accepted && (
+            <>
+              <h3>Misión</h3>
+              <p>
+                {state.world.quest.title} — {state.world.quest.completed ? "Completada" : "En curso"}
+              </p>
+              <p>{state.world.quest.description}</p>
+            </>
+          )}
+
           {isDefeated(state) && (
             <section>
               <h3>Has caído en combate</h3>
@@ -139,6 +154,14 @@ export default function App() {
                     <p>
                       {current.name} {current.dangerous && "⚠️"}
                     </p>
+                    {state.world.npcs
+                      .filter((npc) => npc.locationId === current.id)
+                      .map((npc) => (
+                        <p key={npc.id}>
+                          {npc.name}
+                          <button onClick={handleTalk}>Hablar</button>
+                        </p>
+                      ))}
                     {current.enemy && current.enemy.currentHp > 0 && (
                       <p>
                         {current.enemy.name} — PV {current.enemy.currentHp}/{current.enemy.maxHp}

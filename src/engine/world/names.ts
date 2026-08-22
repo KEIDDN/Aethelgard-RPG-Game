@@ -33,3 +33,5 @@ export const ENEMY_NAMES = [
   "Araña Gigante",
   "Trasgo Huraño",
 ];
+
+export const NPC_NAMES = ["Elric", "Maren", "Tobias", "Ysolda", "Brandt"];
