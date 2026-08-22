@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ARCHETYPES } from "./character/archetypes";
-import { createGameState } from "./gameState";
+import { createGameState, isDefeated } from "./gameState";
 
 describe("createGameState", () => {
   it("assigns attributes and HP from the chosen archetype", () => {
@@ -23,5 +23,18 @@ describe("createGameState", () => {
   it("places the player at the world's starting location", () => {
     const state = createGameState("Aldric", "picaro", 7);
     expect(state.player.currentLocationId).toBe(state.world.startingLocationId);
+  });
+});
+
+describe("isDefeated", () => {
+  it("is false while the player has HP remaining", () => {
+    const state = createGameState("Aldric", "guerrero", 1);
+    expect(isDefeated(state)).toBe(false);
+  });
+
+  it("is true once currentHp reaches zero", () => {
+    const state = createGameState("Aldric", "guerrero", 1);
+    const fallen = { ...state, player: { ...state.player, currentHp: 0 } };
+    expect(isDefeated(fallen)).toBe(true);
   });
 });

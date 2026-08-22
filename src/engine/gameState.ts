@@ -31,6 +31,10 @@ export interface GameState {
   history: string[];
 }
 
+export function isDefeated(state: GameState): boolean {
+  return state.player.currentHp <= 0;
+}
+
 export function createGameState(
   playerName: string,
   archetype: Archetype,

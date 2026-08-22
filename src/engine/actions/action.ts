@@ -1,5 +1,5 @@
 import { attack, canAttack } from "../combat/combat";
-import type { GameState } from "../gameState";
+import { isDefeated, type GameState } from "../gameState";
 import { canInvestigate, investigate } from "./investigate";
 import { canRest, rest } from "./rest";
 import { canTravelTo, travel } from "./travel";
@@ -11,6 +11,10 @@ export type Action =
   | { type: "ATTACK" };
 
 export function canPerformAction(state: GameState, action: Action): boolean {
+  if (isDefeated(state)) {
+    return false;
+  }
+
   switch (action.type) {
     case "TRAVEL":
       return canTravelTo(state, action.targetLocationId);

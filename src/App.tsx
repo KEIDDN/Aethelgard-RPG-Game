@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { resolveAction } from "./engine/actions/action";
 import { ARCHETYPES, type Archetype } from "./engine/character/archetypes";
-import { createGameState, type GameState } from "./engine/gameState";
+import { createGameState, isDefeated, type GameState } from "./engine/gameState";
 import { deleteCampaign, listCampaigns, saveCampaign } from "./persistence/campaignStorage";
 import "./App.css";
 
@@ -120,38 +120,49 @@ export default function App() {
             {state.player.attributes.inteligencia}
           </p>
 
-          <h3>Ubicación actual</h3>
-          {(() => {
-            const current = state.world.region.locations.find(
-              (l) => l.id === state.player.currentLocationId,
-            )!;
-            return (
-              <>
-                <p>
-                  {current.name} {current.dangerous && "⚠️"}
-                </p>
-                {current.enemy && current.enemy.currentHp > 0 && (
-                  <p>
-                    {current.enemy.name} — PV {current.enemy.currentHp}/{current.enemy.maxHp}
-                    <button onClick={handleAttack}>Atacar</button>
-                  </p>
-                )}
-                <button onClick={handleInvestigate}>Investigar</button>
-                <h4>Viajar a</h4>
-                <ul>
-                  {current.connections.map((id) => {
-                    const target = state.world.region.locations.find((l) => l.id === id)!;
-                    return (
-                      <li key={id}>
-                        {target.name} {target.dangerous && "⚠️"}
-                        <button onClick={() => handleTravel(id)}>Viajar</button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </>
-            );
-          })()}
+          {isDefeated(state) && (
+            <section>
+              <h3>Has caído en combate</h3>
+              <p>Tu aventura termina aquí. Puedes guardar este momento o volver al menú.</p>
+            </section>
+          )}
+
+          {!isDefeated(state) && (
+            <>
+              <h3>Ubicación actual</h3>
+              {(() => {
+                const current = state.world.region.locations.find(
+                  (l) => l.id === state.player.currentLocationId,
+                )!;
+                return (
+                  <>
+                    <p>
+                      {current.name} {current.dangerous && "⚠️"}
+                    </p>
+                    {current.enemy && current.enemy.currentHp > 0 && (
+                      <p>
+                        {current.enemy.name} — PV {current.enemy.currentHp}/{current.enemy.maxHp}
+                        <button onClick={handleAttack}>Atacar</button>
+                      </p>
+                    )}
+                    <button onClick={handleInvestigate}>Investigar</button>
+                    <h4>Viajar a</h4>
+                    <ul>
+                      {current.connections.map((id) => {
+                        const target = state.world.region.locations.find((l) => l.id === id)!;
+                        return (
+                          <li key={id}>
+                            {target.name} {target.dangerous && "⚠️"}
+                            <button onClick={() => handleTravel(id)}>Viajar</button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
+                );
+              })()}
+            </>
+          )}
 
           <h3>Historia</h3>
           <ul>
@@ -159,7 +170,7 @@ export default function App() {
               <li key={i}>{entry}</li>
             ))}
           </ul>
-          <button onClick={handleRest}>Descansar</button>
+          {!isDefeated(state) && <button onClick={handleRest}>Descansar</button>}
           <button onClick={handleSave}>Guardar</button>
           <button onClick={() => setState(null)}>Volver al menú</button>
         </section>
