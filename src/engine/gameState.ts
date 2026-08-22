@@ -16,6 +16,8 @@ export interface Player {
   attributes: Attributes;
   maxHp: number;
   currentHp: number;
+  level: number;
+  xp: number;
   currentLocationId: string;
 }
 
@@ -56,6 +58,8 @@ export function createGameState(
       attributes: { ...definition.attributes },
       maxHp: definition.maxHp,
       currentHp: definition.maxHp,
+      level: 1,
+      xp: 0,
       currentLocationId: world.startingLocationId,
     },
     world,

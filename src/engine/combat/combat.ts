@@ -1,3 +1,4 @@
+import { gainXp } from "../character/progression";
 import { attributeModifier, rollForState } from "../dice/dice";
 import type { GameState } from "../gameState";
 import type { Location } from "../world/types";
@@ -51,7 +52,15 @@ export function attack(state: GameState): GameState {
 
   if (defeated) {
     history.push(`¡Has derrotado a ${enemy.name}!`);
-    return { ...working, history: [...working.history, ...history] };
+
+    const xpReward = enemy.maxHp * 2;
+    const { player, leveledUp, newLevel } = gainXp(working.player, xpReward);
+    history.push(`Ganas ${xpReward} puntos de experiencia.`);
+    if (leveledUp) {
+      history.push(`¡Subes al nivel ${newLevel}!`);
+    }
+
+    return { ...working, player, history: [...working.history, ...history] };
   }
 
   const defense = 10 + attributeModifier(state.player.attributes.destreza);

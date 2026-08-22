@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { gainXp } from "../character/progression";
 import { createGameState, type GameState } from "../gameState";
 import { attack, canAttack } from "./combat";
 
@@ -59,11 +60,15 @@ describe("attack", () => {
     expect(after.world.region.locations.find((l) => l.enemy)!.dangerous).toBe(true);
   });
 
-  it("clears dangerous and stops future attacks once the enemy is defeated", () => {
+  it("clears dangerous, stops future attacks, and awards XP once the enemy is defeated", () => {
     // A single hit can't one-shot the enemy (min 8 HP vs. a few damage per hit),
     // so land enough attacks in a row to actually defeat it.
     let state = atDungeon(createGameState("Hero", "guerrero", 1));
+    const enemyMaxHp = state.world.region.locations.find((l) => l.enemy)!.enemy!.maxHp;
+    let playerBeforeFinalHit = state.player;
+
     for (let i = 0; i < 40 && canAttack(state); i++) {
+      playerBeforeFinalHit = state.player;
       state = attack(state);
     }
 
@@ -71,7 +76,11 @@ describe("attack", () => {
     expect(location.enemy!.currentHp).toBe(0);
     expect(location.dangerous).toBe(false);
     expect(canAttack(state)).toBe(false);
-    expect(state.history.at(-1)).toContain("derrotado");
+    expect(state.history.some((entry) => entry.includes("derrotado"))).toBe(true);
+
+    const expectedXp = gainXp(playerBeforeFinalHit, enemyMaxHp * 2);
+    expect(state.player.level).toBe(expectedXp.newLevel);
+    expect(state.history.some((entry) => entry.includes("puntos de experiencia"))).toBe(true);
   });
 
   it("costs the player HP when the enemy counter-attacks and hits", () => {

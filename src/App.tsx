@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { resolveAction } from "./engine/actions/action";
 import { ARCHETYPES, type Archetype } from "./engine/character/archetypes";
+import { XP_PER_LEVEL } from "./engine/character/progression";
 import { createGameState, isDefeated, type GameState } from "./engine/gameState";
 import { deleteCampaign, listCampaigns, saveCampaign } from "./persistence/campaignStorage";
 import "./App.css";
@@ -116,9 +117,14 @@ export default function App() {
           <p>Día: {state.clock.day}</p>
 
           <h3>Personaje</h3>
-          <p>{ARCHETYPES[state.player.archetype].name}</p>
+          <p>
+            {ARCHETYPES[state.player.archetype].name} — Nivel {state.player.level}
+          </p>
           <p>
             PV: {state.player.currentHp} / {state.player.maxHp}
+          </p>
+          <p>
+            XP: {state.player.xp} / {state.player.level * XP_PER_LEVEL}
           </p>
           <p>
             FUE {state.player.attributes.fuerza} · DES {state.player.attributes.destreza} · INT{" "}
