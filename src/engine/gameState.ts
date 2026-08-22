@@ -18,6 +18,7 @@ export interface Player {
   currentHp: number;
   level: number;
   xp: number;
+  gold: number;
   currentLocationId: string;
 }
 
@@ -60,6 +61,7 @@ export function createGameState(
       currentHp: definition.maxHp,
       level: 1,
       xp: 0,
+      gold: 0,
       currentLocationId: world.startingLocationId,
     },
     world,

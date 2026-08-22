@@ -59,7 +59,9 @@ describe("talk", () => {
     const turnedIn = talk(backAtSettlement);
 
     expect(turnedIn.world.quest.completed).toBe(true);
-    expect(turnedIn.history.at(-1)).toContain("Misión completada");
+    expect(turnedIn.history.some((entry) => entry.includes("Misión completada"))).toBe(true);
+    expect(turnedIn.player.gold).toBe(backAtSettlement.player.gold + 20);
+    expect(turnedIn.history.at(-1)).toContain("piezas de oro como recompensa");
   });
 
   it("gives idle flavor once the quest is already completed", () => {

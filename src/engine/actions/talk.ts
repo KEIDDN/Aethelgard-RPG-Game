@@ -14,6 +14,8 @@ export function canTalk(state: GameState): boolean {
   return !!npcAtCurrentLocation(state);
 }
 
+const QUEST_GOLD_REWARD = 20;
+
 function withQuest(state: GameState, quest: Quest): GameState {
   return { ...state, world: { ...state.world, quest } };
 }
@@ -37,11 +39,14 @@ export function talk(state: GameState): GameState {
   }
 
   if (!quest.completed && isObjectiveDone(state, quest)) {
+    const rewarded = withQuest(state, { ...quest, completed: true });
     return {
-      ...withQuest(state, { ...quest, completed: true }),
+      ...rewarded,
+      player: { ...rewarded.player, gold: rewarded.player.gold + QUEST_GOLD_REWARD },
       history: [
         ...state.history,
         `${npc.name}: «¡Gracias, aventurero! Has cumplido tu palabra.» (Misión completada: ${quest.title})`,
+        `Recibes ${QUEST_GOLD_REWARD} piezas de oro como recompensa.`,
       ],
     };
   }

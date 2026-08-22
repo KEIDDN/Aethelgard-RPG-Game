@@ -54,11 +54,17 @@ export function attack(state: GameState): GameState {
     history.push(`¡Has derrotado a ${enemy.name}!`);
 
     const xpReward = enemy.maxHp * 2;
-    const { player, leveledUp, newLevel } = gainXp(working.player, xpReward);
+    const { player: leveledPlayer, leveledUp, newLevel } = gainXp(working.player, xpReward);
     history.push(`Ganas ${xpReward} puntos de experiencia.`);
     if (leveledUp) {
       history.push(`¡Subes al nivel ${newLevel}!`);
     }
+
+    const lootRoll = rollForState(working, 6, 0);
+    working = lootRoll.state;
+    const goldReward = lootRoll.result.roll * 2;
+    const player = { ...leveledPlayer, gold: leveledPlayer.gold + goldReward };
+    history.push(`Encuentras ${goldReward} piezas de oro.`);
 
     return { ...working, player, history: [...working.history, ...history] };
   }

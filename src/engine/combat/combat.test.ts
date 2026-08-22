@@ -81,6 +81,9 @@ describe("attack", () => {
     const expectedXp = gainXp(playerBeforeFinalHit, enemyMaxHp * 2);
     expect(state.player.level).toBe(expectedXp.newLevel);
     expect(state.history.some((entry) => entry.includes("puntos de experiencia"))).toBe(true);
+
+    expect(state.player.gold).toBeGreaterThan(playerBeforeFinalHit.gold);
+    expect(state.history.some((entry) => entry.includes("piezas de oro"))).toBe(true);
   });
 
   it("costs the player HP when the enemy counter-attacks and hits", () => {

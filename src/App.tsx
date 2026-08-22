@@ -126,6 +126,7 @@ export default function App() {
           <p>
             XP: {state.player.xp} / {state.player.level * XP_PER_LEVEL}
           </p>
+          <p>Oro: {state.player.gold}</p>
           <p>
             FUE {state.player.attributes.fuerza} · DES {state.player.attributes.destreza} · INT{" "}
             {state.player.attributes.inteligencia}
