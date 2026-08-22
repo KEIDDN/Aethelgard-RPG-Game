@@ -59,152 +59,278 @@ export default function App() {
   };
 
   return (
-    <main className="app">
-      <h1>Aethelgard</h1>
+    <div className="app-shell">
+      <header className="app-header">
+        <h1>Aethelgard</h1>
+        <p className="app-tagline">Un mundo procedural, una aventura distinta cada vez</p>
+      </header>
 
       {!state && (
-        <section>
-          <h2>Nueva Campaña</h2>
-          <input
-            placeholder="Nombre del personaje"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-          />
+        <>
+          <section className="panel">
+            <div className="panel-header">
+              <h2>Nueva Campaña</h2>
+            </div>
 
-          <h3>Arquetipo</h3>
-          <ul>
-            {Object.values(ARCHETYPES).map((def) => (
-              <li key={def.id}>
-                <label>
-                  <input
-                    type="radio"
-                    name="archetype"
-                    checked={archetype === def.id}
-                    onChange={() => setArchetype(def.id)}
-                  />
-                  <strong>{def.name}</strong> — {def.description} (PV {def.maxHp}, FUE{" "}
-                  {def.attributes.fuerza}, DES {def.attributes.destreza}, INT{" "}
-                  {def.attributes.inteligencia})
-                </label>
-              </li>
-            ))}
-          </ul>
+            <div>
+              <label className="field-label" htmlFor="player-name">
+                Nombre del personaje
+              </label>
+              <input
+                id="player-name"
+                className="text-input"
+                placeholder="Nombre del personaje"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+              />
+            </div>
 
-          <button onClick={startCampaign}>Iniciar campaña</button>
+            <h3>Arquetipo</h3>
+            <ul className="archetype-list">
+              {Object.values(ARCHETYPES).map((def) => (
+                <li key={def.id}>
+                  <label className={`archetype-card${archetype === def.id ? " is-selected" : ""}`}>
+                    <input
+                      type="radio"
+                      name="archetype"
+                      checked={archetype === def.id}
+                      onChange={() => setArchetype(def.id)}
+                    />
+                    <span className="archetype-name">{def.name}</span>
+                    <span className="archetype-desc">{def.description}</span>
+                    <span className="archetype-stats">
+                      <span>PV {def.maxHp}</span>
+                      <span>FUE {def.attributes.fuerza}</span>
+                      <span>DES {def.attributes.destreza}</span>
+                      <span>INT {def.attributes.inteligencia}</span>
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+
+            <button className="btn btn-primary" onClick={startCampaign}>
+              Iniciar campaña
+            </button>
+          </section>
 
           {campaigns.length > 0 && (
-            <>
-              <h2>Cargar Campaña</h2>
-              <ul>
+            <section className="panel">
+              <div className="panel-header">
+                <h2>Cargar Campaña</h2>
+              </div>
+              <ul className="campaign-list">
                 {campaigns.map((c) => (
-                  <li key={c.campaign.id}>
-                    {c.player.name} — semilla {c.campaign.seed} — día {c.clock.day}
-                    <button onClick={() => handleLoad(c)}>Cargar</button>
-                    <button onClick={() => handleDelete(c.campaign.id)}>Eliminar</button>
+                  <li key={c.campaign.id} className="campaign-item">
+                    <span className="campaign-meta">
+                      {c.player.name} — semilla {c.campaign.seed} — día {c.clock.day}
+                    </span>
+                    <span className="btn-row">
+                      <button className="btn" onClick={() => handleLoad(c)}>
+                        Cargar
+                      </button>
+                      <button className="btn btn-danger" onClick={() => handleDelete(c.campaign.id)}>
+                        Eliminar
+                      </button>
+                    </span>
                   </li>
                 ))}
               </ul>
-            </>
-          )}
-        </section>
-      )}
-
-      {state && (
-        <section>
-          <h2>{state.player.name}</h2>
-          <p>Semilla de campaña: {state.campaign.seed}</p>
-          <p>Región: {state.world.region.name}</p>
-          <p>Día: {state.clock.day}</p>
-
-          <h3>Personaje</h3>
-          <p>
-            {ARCHETYPES[state.player.archetype].name} — Nivel {state.player.level}
-          </p>
-          <p>
-            PV: {state.player.currentHp} / {state.player.maxHp}
-          </p>
-          <p>
-            XP: {state.player.xp} / {state.player.level * XP_PER_LEVEL}
-          </p>
-          <p>Oro: {state.player.gold}</p>
-          <p>
-            FUE {state.player.attributes.fuerza} · DES {state.player.attributes.destreza} · INT{" "}
-            {state.player.attributes.inteligencia}
-          </p>
-
-          {state.world.quest.accepted && (
-            <>
-              <h3>Misión</h3>
-              <p>
-                {state.world.quest.title} — {state.world.quest.completed ? "Completada" : "En curso"}
-              </p>
-              <p>{state.world.quest.description}</p>
-            </>
-          )}
-
-          {isDefeated(state) && (
-            <section>
-              <h3>Has caído en combate</h3>
-              <p>Tu aventura termina aquí. Puedes guardar este momento o volver al menú.</p>
             </section>
           )}
+        </>
+      )}
 
-          {!isDefeated(state) && (
-            <>
-              <h3>Ubicación actual</h3>
-              {(() => {
-                const current = state.world.region.locations.find(
-                  (l) => l.id === state.player.currentLocationId,
-                )!;
-                return (
-                  <>
-                    <p>
-                      {current.name} {current.dangerous && "⚠️"}
+      {state &&
+        (() => {
+          const hpPct = Math.round((state.player.currentHp / state.player.maxHp) * 100);
+          const xpThreshold = state.player.level * XP_PER_LEVEL;
+          const xpPct = Math.round((state.player.xp / xpThreshold) * 100);
+          const defeated = isDefeated(state);
+          const current = state.world.region.locations.find(
+            (l) => l.id === state.player.currentLocationId,
+          )!;
+          const npcHere = state.world.npcs.filter((npc) => npc.locationId === current.id);
+
+          return (
+            <div className="layout">
+              <aside className="sidebar">
+                <section className="panel">
+                  <div className="panel-header">
+                    <h2>{state.player.name}</h2>
+                    <span className="char-level">Nv. {state.player.level}</span>
+                  </div>
+
+                  <div className="stat-block">
+                    <div className="stat-row">
+                      <span className="label">{ARCHETYPES[state.player.archetype].name}</span>
+                      <span>
+                        {state.player.currentHp}/{state.player.maxHp} PV
+                      </span>
+                    </div>
+                    <div className="bar">
+                      <div className="bar-fill bar-fill--hp" style={{ width: `${hpPct}%` }} />
+                    </div>
+
+                    <div className="stat-row">
+                      <span className="label">Experiencia</span>
+                      <span>
+                        {state.player.xp}/{xpThreshold} XP
+                      </span>
+                    </div>
+                    <div className="bar">
+                      <div className="bar-fill bar-fill--xp" style={{ width: `${xpPct}%` }} />
+                    </div>
+                  </div>
+
+                  <p className="gold-line">🪙 {state.player.gold} de oro</p>
+
+                  <p className="attributes">
+                    <span>
+                      FUE <b>{state.player.attributes.fuerza}</b>
+                    </span>
+                    <span>
+                      DES <b>{state.player.attributes.destreza}</b>
+                    </span>
+                    <span>
+                      INT <b>{state.player.attributes.inteligencia}</b>
+                    </span>
+                  </p>
+                </section>
+
+                <section className="panel">
+                  <div className="panel-header">
+                    <h3>Campaña</h3>
+                  </div>
+                  <p className="campaign-meta">Semilla: {state.campaign.seed}</p>
+                  <p className="campaign-meta">Región: {state.world.region.name}</p>
+                  <p className="campaign-meta">Día: {state.clock.day}</p>
+                </section>
+
+                {state.world.quest.accepted && (
+                  <section className="panel quest-panel">
+                    <div className="panel-header">
+                      <h3>Misión</h3>
+                      <span
+                        className={`quest-status${state.world.quest.completed ? " is-complete" : ""}`}
+                      >
+                        {state.world.quest.completed ? "Completada" : "En curso"}
+                      </span>
+                    </div>
+                    <p className="quest-title">{state.world.quest.title}</p>
+                    <p className="quest-desc">{state.world.quest.description}</p>
+                  </section>
+                )}
+              </aside>
+
+              <div className="main-column">
+                {defeated ? (
+                  <section className="panel game-over-panel">
+                    <h3>Has caído en combate</h3>
+                    <p>Tu aventura termina aquí. Puedes guardar este momento o volver al menú.</p>
+                  </section>
+                ) : (
+                  <section className="panel">
+                    <div className="panel-header">
+                      <h2>Ubicación actual</h2>
+                    </div>
+                    <p className="location-name">
+                      {current.name}
+                      {current.dangerous ? (
+                        <span className="badge-danger">⚠ Peligro</span>
+                      ) : (
+                        <span className="badge-safe">Seguro</span>
+                      )}
                     </p>
-                    {state.world.npcs
-                      .filter((npc) => npc.locationId === current.id)
-                      .map((npc) => (
-                        <p key={npc.id}>
-                          {npc.name}
-                          <button onClick={handleTalk}>Hablar</button>
-                        </p>
-                      ))}
+
+                    {npcHere.map((npc) => (
+                      <div className="npc-card" key={npc.id}>
+                        <span className="npc-name">🗣 {npc.name}</span>
+                        <button className="btn" onClick={handleTalk}>
+                          Hablar
+                        </button>
+                      </div>
+                    ))}
+
                     {current.enemy && current.enemy.currentHp > 0 && (
-                      <p>
-                        {current.enemy.name} — PV {current.enemy.currentHp}/{current.enemy.maxHp}
-                        <button onClick={handleAttack}>Atacar</button>
-                      </p>
+                      <div className="encounter-card">
+                        <div className="encounter-header">
+                          <span className="encounter-name">☠ {current.enemy.name}</span>
+                          <span>
+                            {current.enemy.currentHp}/{current.enemy.maxHp} PV
+                          </span>
+                        </div>
+                        <div className="bar">
+                          <div
+                            className="bar-fill bar-fill--hp"
+                            style={{
+                              width: `${Math.round((current.enemy.currentHp / current.enemy.maxHp) * 100)}%`,
+                            }}
+                          />
+                        </div>
+                        <button className="btn btn-danger" onClick={handleAttack}>
+                          Atacar
+                        </button>
+                      </div>
                     )}
-                    <button onClick={handleInvestigate}>Investigar</button>
+
+                    <div className="btn-row">
+                      <button className="btn" onClick={handleInvestigate}>
+                        Investigar
+                      </button>
+                      <button className="btn" onClick={handleRest}>
+                        Descansar
+                      </button>
+                    </div>
+
                     <h4>Viajar a</h4>
-                    <ul>
+                    <ul className="travel-list">
                       {current.connections.map((id) => {
                         const target = state.world.region.locations.find((l) => l.id === id)!;
                         return (
-                          <li key={id}>
-                            {target.name} {target.dangerous && "⚠️"}
-                            <button onClick={() => handleTravel(id)}>Viajar</button>
+                          <li key={id} className="travel-item">
+                            <span className="travel-item-name">
+                              {target.name}
+                              {target.dangerous && <span className="badge-danger">⚠</span>}
+                            </span>
+                            <button className="btn" onClick={() => handleTravel(id)}>
+                              Viajar
+                            </button>
                           </li>
                         );
                       })}
                     </ul>
-                  </>
-                );
-              })()}
-            </>
-          )}
+                  </section>
+                )}
 
-          <h3>Historia</h3>
-          <ul>
-            {state.history.map((entry, i) => (
-              <li key={i}>{entry}</li>
-            ))}
-          </ul>
-          {!isDefeated(state) && <button onClick={handleRest}>Descansar</button>}
-          <button onClick={handleSave}>Guardar</button>
-          <button onClick={() => setState(null)}>Volver al menú</button>
-        </section>
-      )}
-    </main>
+                <section className="panel">
+                  <div className="panel-header">
+                    <h3>Historia</h3>
+                  </div>
+                  <ul className="history-log">
+                    {state.history
+                      .slice()
+                      .reverse()
+                      .map((entry, i) => (
+                        <li key={state.history.length - i} className="history-entry">
+                          {entry}
+                        </li>
+                      ))}
+                  </ul>
+                </section>
+
+                <div className="btn-row">
+                  <button className="btn" onClick={handleSave}>
+                    Guardar
+                  </button>
+                  <button className="btn" onClick={() => setState(null)}>
+                    Volver al menú
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+    </div>
   );
 }
